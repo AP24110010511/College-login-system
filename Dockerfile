@@ -1,4 +1,14 @@
-# Base image with Node.js and Playwright dependencies
+# Stage 1: Build Frontend
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm install
+
+COPY frontend/ ./frontend/
+RUN cd frontend && npm run build
+
+# Stage 2: Production Runtime with Playwright & Chromium
 FROM node:20-bookworm-slim
 
 WORKDIR /app
@@ -26,30 +36,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2 \
     && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
-ENV HEADLESS=true
-ENV SERVE_STATIC=true
-
-# Copy package manifests
-COPY package.json ./
-COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
-
-# Install dependencies
+COPY backend/package*.json ./backend/
 RUN cd backend && npm install --omit=dev
-RUN cd frontend && npm install
 
 # Install Chromium browser binary for Playwright
 RUN cd backend && npx playwright install chromium
 
-# Copy app source code
+# Copy backend source code
 COPY backend/ ./backend/
-COPY frontend/ ./frontend/
 
-# Build frontend production bundle
-RUN cd frontend && npm run build
+# Copy compiled frontend build from builder stage
+COPY --from=builder /app/frontend/dist ./frontend/dist
 
-# Default fallback port (Render injects PORT dynamically)
+ENV NODE_ENV=production
+ENV HEADLESS=true
+ENV SERVE_STATIC=true
+
 EXPOSE 5001 10000 8080
 
 WORKDIR /app/backend
