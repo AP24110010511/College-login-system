@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  srm-portal-tool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: srm-ap-portal-tool
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - NODE_ENV=production
+      - HEADLESS=true
+      - SERVE_STATIC=true
+      - SRM_PORTAL_URL=https://student.srmap.edu.in/srmapstudentcorner/StudentLoginPage
+      - SESSION_TTL_MS=300000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

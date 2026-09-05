@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: srm-ap-student-portal-tool
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 5001
+      - key: NODE_ENV
+        value: production
+      - key: HEADLESS
+        value: "true"
+      - key: SERVE_STATIC
+        value: "true"
+      - key: SRM_PORTAL_URL
+        value: https://student.srmap.edu.in/srmapstudentcorner/StudentLoginPage
+      - key: SESSION_TTL_MS
+        value: "300000"
