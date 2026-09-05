@@ -94,8 +94,8 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-const server = app.listen(PORT, () => {
-  console.log(`[Server] SRM AP Login Tool Backend running on http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[Server] SRM AP Login Tool Backend running on port ${PORT}`);
   console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`[Server] Allowed Frontend: ${FRONTEND_URL}`);
 });
