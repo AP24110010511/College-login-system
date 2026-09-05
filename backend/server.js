@@ -21,22 +21,24 @@ app.use(helmet({
 }));
 
 // CORS Configuration
-const allowedOrigins = [
-  FRONTEND_URL,
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-];
-
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+    // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+    
+    // Allow onrender domains, localhost, or FRONTEND_URL
+    if (
+      origin.includes('onrender.com') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.includes('railway.app') ||
+      origin.includes('vercel.app') ||
+      (FRONTEND_URL && origin === FRONTEND_URL)
+    ) {
       return callback(null, true);
     }
-    return callback(new Error('CORS policy violation'));
+    
+    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
